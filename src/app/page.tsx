@@ -44,7 +44,7 @@ export default function Home() {
       <div className="flex-1 flex w-full bg-white shadow-2xl">
 
         {/* DealSmart Nav (Left slim bar) */}
-        <div className="w-16 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-6 gap-6">
+        <div className="hidden md:flex w-16 bg-slate-900 border-r border-slate-800 flex-col items-center py-6 gap-6 flex-shrink-0">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
             <Bot className="w-6 h-6" />
           </div>
@@ -54,18 +54,20 @@ export default function Home() {
         </div>
 
         {/* Dynamic Sidebar List */}
-        <Sidebar
-          conversations={conversations}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-        />
+        <div className={`w-full md:w-80 flex-shrink-0 ${selectedId ? 'hidden md:flex' : 'flex'} flex-col`}>
+          <Sidebar
+            conversations={conversations}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+          />
+        </div>
 
         {/* Main Chat/Display Area */}
-        <main className="flex-1 flex flex-col bg-slate-50 relative">
+        <main className={`flex-1 flex flex-col bg-slate-50 relative ${selectedId ? 'flex' : 'hidden md:flex'}`}>
           {selectedId ? (
-            <ChatArea key={selectedId} conversationId={selectedId} />
+            <ChatArea key={selectedId} conversationId={selectedId} onBack={() => setSelectedId(null)} />
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-8">
               <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6">
                 <Bot className="w-10 h-10 text-slate-300" />
               </div>

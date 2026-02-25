@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import clsx from 'clsx'
-import { Send, Bot, X, Loader2, User, Phone, Mail } from 'lucide-react'
+import { Send, Bot, X, Loader2, User, Phone, Mail, ChevronLeft } from 'lucide-react'
 import AiSelector from './AiSelector'
 
 /**
@@ -15,7 +15,7 @@ import AiSelector from './AiSelector'
  * @param {{conversationId: string}} props - The active conversation ID to render.
  * @returns {JSX.Element} The Chat wrapper containing header, history feed and input box.
  */
-export default function ChatArea({ conversationId }: { conversationId: string }) {
+export default function ChatArea({ conversationId, onBack }: { conversationId: string, onBack?: () => void }) {
     const [data, setData] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [inputVal, setInputVal] = useState('')
@@ -160,24 +160,32 @@ export default function ChatArea({ conversationId }: { conversationId: string })
     }
 
     return (
-        <div className="flex-1 flex flex-col bg-slate-50 h-full relative">
+        <div className="flex-1 flex flex-col bg-slate-50 h-full relative w-full overflow-hidden">
             {/* Header with HubSpot CRM Info */}
-            <div className="h-[80px] px-6 border-b border-slate-200 bg-white flex items-center justify-between z-10 shrink-0">
-                <div className="flex items-center gap-3">
+            <div className="h-[80px] p-4 md:px-6 border-b border-slate-200 bg-white flex items-center justify-between z-10 shrink-0 gap-2 overflow-x-auto">
+                <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+                    {onBack && (
+                        <button
+                            onClick={onBack}
+                            className="md:hidden p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                    )}
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold shrink-0">
                         {data.contact?.name?.charAt(0) || '?'}
                     </div>
                     <div>
-                        <h2 className="font-semibold text-slate-800">{data.contact?.name || 'Unknown Contact'}</h2>
-                        <div className="flex gap-3 text-xs text-slate-500">
+                        <h2 className="font-semibold text-slate-800 text-sm md:text-base whitespace-nowrap">{data.contact?.name || 'Unknown Contact'}</h2>
+                        <div className="hidden md:flex gap-3 text-xs text-slate-500">
                             {data.contact?.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {data.contact.phone}</span>}
                             {data.contact?.email && <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {data.contact.email}</span>}
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
                     <AiSelector />
-                    <span className="text-xs font-semibold bg-slate-100 rounded px-2 py-1 flex items-center gap-1 text-slate-600">
+                    <span className="hidden md:flex text-xs font-semibold bg-slate-100 rounded px-2 py-1 items-center gap-1 text-slate-600">
                         <User className="w-3 h-3" /> CRM Sync
                     </span>
                 </div>
@@ -284,12 +292,12 @@ export default function ChatArea({ conversationId }: { conversationId: string })
                         disabled={suggesting}
                         title="Generate AI Reply"
                         className={clsx(
-                            "px-3 py-2 rounded-xl flex items-center justify-center gap-2 flex-shrink-0 transition-colors text-sm font-semibold",
+                            "px-2 md:px-3 py-2 rounded-xl flex items-center justify-center gap-1 md:gap-2 flex-shrink-0 transition-colors text-xs md:text-sm font-semibold",
                             suggesting ? "bg-slate-200 cursor-not-allowed text-slate-500" : "bg-slate-800 text-white hover:bg-slate-700 shadow-sm"
                         )}
                     >
                         {suggesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bot className="w-4 h-4" />}
-                        {suggesting ? "Thinking..." : "Suggest AI Reply"}
+                        <span className="hidden sm:inline">{suggesting ? "Thinking..." : "Suggest AI Reply"}</span>
                     </button>
 
                     <textarea
