@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧠 DealSmart AI Communications Hub
 
-## Getting Started
+[![Next.js](https://img.shields.io/badge/Next.js-15.0-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Vitest](https://img.shields.io/badge/Vitest-Testing-729B1B?style=flat-square&logo=vitest)](https://vitest.dev/)
 
-First, run the development server:
+*Read the Portuguese version: [README.pt-BR.md](README.pt-BR.md)*
 
+Welcome to the **DealSmart AI Communications Hub**. This application is a real-time CRM interface designed to assist sales teams with AI-generated responses. It acts as an Omnichannel Inbox, tracking customer conversations and providing contextual replies using multiple LLMs (OpenAI, Google Gemini, Anthropic Claude).
+
+## ✨ Key Features
+
+- **Multi-LLM Engine:** Switch between ChatGPT-4o, Gemini 2.5 Flash, and Claude 3 using a UI selector. The backend uses the Factory and Strategy patterns for easy model swapping.
+- **Optimistic UI & Short-Polling:** Real-time chat fluidity without WebSockets. The UI uses optimistic updates combined with polling to prevent screen flickering or layout shifts.
+- **Rate-Limiting Cache:** An In-Memory LRU Cache manages HubSpot CRM API requests, preventing API rate limit issues during active polling.
+- **CRM Synchronization:** Messages sync securely to HubSpot as Notes tied to the Contact, with graceful fallbacks if the CRM API is unavailable.
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+Ensure you have the following installed on your machine:
+- **Node.js** (v18 or higher recommended)
+- **npm** or **yarn**
+
+### 2. Installation
+Clone the repository and install the dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-url>
+cd dealsmart-hub
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Environment Configuration
+Create a `.env` file in the root directory and populate it with your API keys. The app dynamically adapts to whatever keys you provide.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+# Database
+DATABASE_URL="file:./dev.db"
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# CRM Configuration
+HUBSPOT_ACCESS_TOKEN="your_hubspot_private_app_token"
 
-## Learn More
+# AI Providers (Feel free to configure one or all of them)
+OPENAI_API_KEY="sk-..."
+GEMINI_API_KEY="AIza..."
+CLAUDE_API_KEY="sk-ant-..."
+```
+> **Note:** The UI Dropdown will automatically hide AI models that lack a configured API key in this file.
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Database Setup
+This project uses SQLite for ease of evaluation. Initialize the Prisma ORM:
+```bash
+npx prisma db push
+npx prisma generate
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+*(Optional)* Seed the database with sample conversations:
+```bash
+npx prisma db seed
+```
+*(If you haven't configured a seed script yet, you can manually insert a record via `npx prisma studio` to test the UI).*
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 5. Run the Application
+Start the Next.js development server:
+```bash
+npm run dev
+```
+Navigate to `http://localhost:3000` in your browser.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🧪 Testing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project employs **Vitest** to ensure the architectural integrity of the core business logic. We focus our testing strategy on the critical paths: AI Factory instantiation, Fallback mechanisms, and API Rate-Limiting Cache Logic.
+
+To run the test suite:
+```bash
+npm run test
+```
+
+To run tests in interactive watch mode during development:
+```bash
+npm run test:watch
+```
+
+## 🏗️ Architecture Deep Dive
+
+The technical decisions behind this project were made to showcase Senior-level software engineering practices, prioritizing maintainability, security, and performance. 
+
+For a comprehensive explanation of the **Factory Pattern**, **Optimistic State Merging**, and our **Serverless Caching Strategy**, please read our detailed Architecture Document:
+
+👉 **[Read the Architecture Documentation (ARCHITECTURE.md)](ARCHITECTURE.md)**

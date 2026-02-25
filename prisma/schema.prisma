@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Conversation {
+  id               String    @id @default(uuid())
+  hubspotContactId String
+  status           String    @default("NEW") // NEW, IN_PROGRESS, RESOLVED
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  messages         Message[]
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  senderType     String       // CUSTOMER, HUMAN_AGENT, AI_AGENT
+  text           String
+  createdAt      DateTime     @default(now())
+  hubspotNoteId  String?
+  syncFailed     Boolean      @default(false)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model AppSettings {
+  id             String   @id @default("global") 
+  activeAiConfig String   @default("GEMINI") // "OPENAI", "GEMINI", "CLAUDE"
+  updatedAt      DateTime @updatedAt
+}
