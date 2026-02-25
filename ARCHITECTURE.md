@@ -52,7 +52,7 @@ The AI Suggestion feature acts as the core intelligence loop, analyzing the ongo
 ### Implementation and Context
 When generating a reply, the system must structure the prompt for the LLM effectively:
 - **Context Awareness:** The frontend maps previous messages into standard `User` (Customer) and `Assistant/Model` (Sales Rep) roles. This ensures the language model accurately interprets the dialogue history.
-- **System Prompts:** Before the request reaches the external LLM providers, the Factory Provider class [injects a `System Prompt`](src/lib/ai/OpenAiProvider.ts#L25). This instruction enforces the AI's persona, ensuring all generated responses remain professional, concise, and focused on dealership sales.
+- **Dynamic System Prompts:** Before the request reaches the external LLM providers, the Factory Provider class [injects a `System Prompt`](src/app/api/ai/suggest/route.ts#L29) retrieved directly from the Database (`AppSettings`). This instruction enforces the AI's persona, and the dealership owner can update this prompt dynamically via the UI without a code deploy.
 
 ### Token Optimization Controls
 LLM APIs charge per token (input and output text volume). To ensure operational cost-efficiency and low network latency, two limits were implemented:

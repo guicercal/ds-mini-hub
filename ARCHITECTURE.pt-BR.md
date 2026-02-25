@@ -51,7 +51,7 @@ A funcionalidade de sugestão de respostas atua como o motor de inteligência do
 ### Funcionamento e Contexto
 Para garantir que a Inteligência Artificial compreenda a linha do tempo da negociação, as seguintes regras foram implementadas:
 - **Consciência de Diálogo (Context Awareness):** As mensagens são mapeadas e convertidas para os papéis de `User` (Cliente) e `Assistant/Model` (Vendedor). Isso assegura que o modelo de linguagem não perca o contexto de quem disse o quê.
-- **System Prompts:** Antes de enviar a requisição ao LLM (OpenAI, Gemini ou Claude), a classe provedora [injeta uma instrução de sistema (`System Prompt`)](src/lib/ai/OpenAiProvider.ts#L25). Esta instrução define a "persona" da IA, garantindo que as respostas mantenham o tom de voz profissional e orientado a vendas da empresa.
+- **System Prompts Dinâmicos:** Antes de enviar a requisição ao LLM (OpenAI, Gemini ou Claude), a classe provedora [injeta uma instrução de sistema (`System Prompt`)](src/app/api/ai/suggest/route.ts#L29) lida diretamente do Banco de Dados (`AppSettings`). Esta instrução define a "persona" da IA, permitindo que o gestor da concessionária edite as regras de vendas pela Interface Gráfica, sem precisar de re-deploys de código.
 
 ### Otimização e Controle de Tokens
 APIs de LLM precificam requisições com base na contagem de Tokens (volume de texto trafegado). Para evitar custos operacionais fora de controle e otimizar a performance da rede, aplicamos dois limitadores:
