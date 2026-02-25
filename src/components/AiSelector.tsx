@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Sparkles, Loader2 } from 'lucide-react'
+import { Sparkles, Loader2, Settings } from 'lucide-react'
 
 export default function AiSelector() {
     const [available, setAvailable] = useState<string[]>([])
@@ -64,23 +64,32 @@ export default function AiSelector() {
     }
 
     return (
-        <div className="flex items-center gap-1.5 bg-indigo-50 px-2 py-1 rounded border border-indigo-100 transition-colors hover:border-indigo-200 cursor-pointer">
-            <div className="flex items-center gap-1.5" onClick={() => setIsSettingsOpen(true)} title="AI Settings & Prompt">
-                <Sparkles className="w-3 h-3 text-indigo-600" />
-            </div>
-
-            <select
-                value={active}
-                onChange={handleChange}
-                className="bg-transparent text-xs font-semibold text-indigo-800 outline-none cursor-pointer appearance-none pr-3"
+        <div className="flex items-center gap-2">
+            {/* Settings Button */}
+            <button
+                onClick={() => setIsSettingsOpen(true)}
+                title="AI Settings & Prompt"
+                className="flex items-center justify-center p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-md border border-slate-200 transition-colors"
             >
-                {available.map(ai => {
-                    const label = ai === 'GEMINI' ? 'Google Gemini'
-                        : ai === 'OPENAI' ? 'ChatGPT 4o'
-                            : ai === 'CLAUDE' ? 'Claude 3' : ai
-                    return <option key={ai} value={ai}>{label}</option>
-                })}
-            </select>
+                <Settings className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Configured AI Selector Dropdown */}
+            <div className="flex items-center gap-1.5 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100 transition-colors hover:border-indigo-200">
+                <Sparkles className="w-3 h-3 text-indigo-600" />
+                <select
+                    value={active}
+                    onChange={handleChange}
+                    className="bg-transparent text-xs font-semibold text-indigo-800 outline-none cursor-pointer appearance-none pr-3"
+                >
+                    {available.map(ai => {
+                        const label = ai === 'GEMINI' ? 'Google Gemini'
+                            : ai === 'OPENAI' ? 'ChatGPT 4o'
+                                : ai === 'CLAUDE' ? 'Claude 3' : ai
+                        return <option key={ai} value={ai}>{label}</option>
+                    })}
+                </select>
+            </div>
 
             {isSettingsOpen && (
                 <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
