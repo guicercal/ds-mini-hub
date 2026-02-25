@@ -16,16 +16,25 @@ import { Bot, Inbox } from 'lucide-react'
 export default function Home() {
   const [conversations, setConversations] = useState([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const LIMIT = 15
 
   useEffect(() => {
-    // Initial fetch of conversations based on the SWR polling strategy we used in ChatArea
-    // A more advanced app would use SSE, but SWR/Polling is fast enough for the assessment context
     const fetchList = async () => {
       try {
-        const res = await fetch('/api/conversations')
+        const queryParams = new URLSearchParams()
+        if (searchQuery) queryParams.set('search', searchQuery)
+        queryParams.set('page', '1')
+        // We fetch all loaded pages at once to maintain the list smoothly during polling
+        queryParams.set('limit', (page * LIMIT).toString())
+
+        const res = await fetch(`/api/conversations?${queryParams.toString()}`)
         if (res.ok) {
-          const data = await res.json()
+          const { data, totalCount } = await res.json()
           setConversations(data)
+          setTotalCount(totalCount)
         }
       } catch (e) {
         console.error(e)
@@ -35,7 +44,9 @@ export default function Home() {
     fetchList()
     const interval = setInterval(fetchList, 5000) // update sidebar every 5s
     return () => clearInterval(interval)
-  }, [])
+  }, [searchQuery, page])
+
+  const hasMore = conversations.length < totalCount
 
   return (
     <div className="flex h-screen bg-slate-100 font-sans font-inter overflow-hidden selection:bg-blue-100 selection:text-blue-900">
@@ -59,6 +70,10 @@ export default function Home() {
             conversations={conversations}
             selectedId={selectedId}
             onSelect={setSelectedId}
+            searchQuery={searchQuery}
+            onSearch={setSearchQuery}
+            onLoadMore={() => setPage(p => p + 1)}
+            hasMore={hasMore}
           />
         </div>
 

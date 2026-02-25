@@ -13,8 +13,13 @@ import { CachedHubspotService } from '@/lib/hubspot-cache'
  * @returns {Promise<NextResponse>} A JSON array of enriched conversations
  *   containing id, status, contactName, lastMessage, and timestamp.
  */
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const url = new URL(request.url)
+        const search = url.searchParams.get('search')?.toLowerCase() || ''
+        const page = parseInt(url.searchParams.get('page') || '1', 10)
+        const limit = parseInt(url.searchParams.get('limit') || '20', 10)
+
         const conversations = await prisma.conversation.findMany({
             include: {
                 messages: {
@@ -47,7 +52,27 @@ export async function GET() {
             })
         )
 
-        return NextResponse.json(enrichedConversations)
+        // Filter by search string
+        let filteredConversations = enrichedConversations
+        if (search) {
+            filteredConversations = enrichedConversations.filter(c =>
+                c.contactName.toLowerCase().includes(search) ||
+                c.lastMessage.toLowerCase().includes(search)
+            )
+        }
+
+        const totalCount = filteredConversations.length
+
+        // Paginate
+        const offset = (page - 1) * limit
+        const paginatedData = filteredConversations.slice(offset, offset + limit)
+
+        return NextResponse.json({
+            data: paginatedData,
+            totalCount,
+            page,
+            totalPages: Math.ceil(totalCount / limit)
+        })
     } catch (error) {
         console.error('Failed to fetch conversations:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
