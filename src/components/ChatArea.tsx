@@ -284,11 +284,12 @@ export default function ChatArea({ conversationId }: { conversationId: string })
                         disabled={suggesting}
                         title="Generate AI Reply"
                         className={clsx(
-                            "p-2 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors",
-                            suggesting ? "bg-slate-200 cursor-not-allowed" : "bg-slate-800 text-white hover:bg-slate-700 shadow-sm"
+                            "px-3 py-2 rounded-xl flex items-center justify-center gap-2 flex-shrink-0 transition-colors text-sm font-semibold",
+                            suggesting ? "bg-slate-200 cursor-not-allowed text-slate-500" : "bg-slate-800 text-white hover:bg-slate-700 shadow-sm"
                         )}
                     >
-                        {suggesting ? <Loader2 className="w-5 h-5 animate-spin text-slate-500" /> : <Bot className="w-5 h-5" />}
+                        {suggesting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bot className="w-4 h-4" />}
+                        {suggesting ? "Thinking..." : "Suggest AI Reply"}
                     </button>
 
                     <textarea
