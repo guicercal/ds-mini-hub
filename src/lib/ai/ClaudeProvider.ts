@@ -32,8 +32,24 @@ Rules:
 
         const formattedMessages = messages.map((msg) => ({
             role: msg.senderType === 'CUSTOMER' ? 'user' : 'assistant',
-            content: msg.text
+            content: msg.text || '(media/attachment)'
         }))
+
+        formattedMessages.push({
+            role: 'user',
+            content: '[System Function]: Draft the next reply for Max to send to the customer.'
+        })
+
+        // Anthropic requires strictly alternating 'user' / 'assistant' messages.
+        const mergedMessages = formattedMessages.reduce((acc, current) => {
+            const last = acc[acc.length - 1]
+            if (last && last.role === current.role) {
+                last.content += '\n\n' + current.content
+            } else {
+                acc.push(current)
+            }
+            return acc
+        }, [] as any[])
 
         const response = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',
@@ -47,7 +63,7 @@ Rules:
                 max_tokens: 150,
                 temperature: 0.7,
                 system: systemPrompt,
-                messages: formattedMessages
+                messages: mergedMessages
             })
         })
 

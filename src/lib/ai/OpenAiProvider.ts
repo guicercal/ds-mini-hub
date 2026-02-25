@@ -34,8 +34,9 @@ Rules:
             { role: 'system', content: systemPrompt },
             ...messages.map((msg) => ({
                 role: msg.senderType === 'CUSTOMER' ? 'user' : 'assistant',
-                content: msg.text
-            }))
+                content: msg.text || '(media/attachment)'
+            })),
+            { role: 'user', content: '[System Function]: Draft the next reply for Max to send to the customer.' }
         ]
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {

@@ -32,8 +32,25 @@ Rules:
 
         const formattedMessages = messages.map((msg) => ({
             role: msg.senderType === 'CUSTOMER' ? 'user' : 'model',
-            parts: [{ text: msg.text }]
+            parts: [{ text: msg.text || '(media/attachment)' }]
         }))
+
+        // Força o modelo a gerar uma resposta mesmo se a última mensagem tiver sido da própria loja
+        formattedMessages.push({
+            role: 'user',
+            parts: [{ text: '[System Function]: Draft the next reply for Max to send to the customer.' }]
+        })
+
+        // Gemini requires strictly alternating 'user' / 'model'
+        const mergedMessages = formattedMessages.reduce((acc, current) => {
+            const last = acc[acc.length - 1]
+            if (last && last.role === current.role) {
+                last.parts[0].text += '\n\n' + current.parts[0].text
+            } else {
+                acc.push({ role: current.role, parts: [{ text: current.parts[0].text }] })
+            }
+            return acc
+        }, [] as any[])
 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.apiKey}`
 
@@ -46,7 +63,7 @@ Rules:
                 systemInstruction: {
                     parts: [{ text: systemPrompt }]
                 },
-                contents: formattedMessages,
+                contents: mergedMessages,
                 generationConfig: {
                     temperature: 0.7,
                     maxOutputTokens: 1000
@@ -64,7 +81,7 @@ Rules:
         const suggestion = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
 
         if (!suggestion) {
-            throw new Error("Gemini returned an empty suggestion")
+            console.error("DEBUG GEMINI DATA", JSON.stringify(data, null, 2)); throw new Error("Gemini returned an empty suggestion")
         }
 
         return suggestion
