@@ -60,7 +60,8 @@ export async function POST(request: Request) {
         })
 
         return NextResponse.json(settings)
-    } catch (e) {
+    } catch (e: any) {
+        console.error("AI Settings POST error:", e.message || e)
         return NextResponse.json({ error: 'Failed updating global settings' }, { status: 500 })
     }
 }
