@@ -18,7 +18,8 @@ export interface AiProvider {
      * Generates a suggested response based on the conversation history.
      * 
      * @param {Message[]} messages - Ordered history of past conversation messages.
+     * @param {string} [systemPrompt] - Optional custom instructions to override the default behavior.
      * @returns {Promise<string>} The final message output to be proposed to the user.
      */
-    generateSuggestion(messages: Message[]): Promise<string>
+    generateSuggestion(messages: Message[], systemPrompt?: string): Promise<string>
 }

@@ -23,8 +23,20 @@ export async function POST(request: Request) {
         // Use the Factory Pattern to obtain the active AI Strategy reading from Prisma
         const aiProvider = await AiFactory.getProvider()
 
+        let systemPrompt: string | undefined
         try {
-            const suggestion = await aiProvider.generateSuggestion(messages)
+            const settings = await require('@/lib/prisma').default.appSettings.findUnique({
+                where: { id: 'global' }
+            })
+            if (settings?.systemPrompt) {
+                systemPrompt = settings.systemPrompt
+            }
+        } catch (e) {
+            console.warn("Failed to lookup system prompt, using default")
+        }
+
+        try {
+            const suggestion = await aiProvider.generateSuggestion(messages, systemPrompt)
             return NextResponse.json({ suggestion })
         } catch (providerError: any) {
             console.warn("AI Provider Error. Returning fallback.", providerError)

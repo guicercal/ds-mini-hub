@@ -17,12 +17,12 @@ export class GeminiProvider implements AiProvider {
      * @param {Message[]} messages - The array of conversation messages.
      * @returns {Promise<string>} The AI-generated suggestion block.
      */
-    async generateSuggestion(messages: Message[]): Promise<string> {
+    async generateSuggestion(messages: Message[], systemPromptOverride?: string): Promise<string> {
         if (!this.apiKey) {
             throw new Error("GEMINI_API_KEY is not set.")
         }
 
-        const systemPrompt = `You are a helpful and professional dealership sales advisor named Max at DealSmart Motors. 
+        const systemPrompt = systemPromptOverride || `You are a helpful and professional dealership sales advisor named Max at DealSmart Motors. 
 Your goal is to assist customers with their inquiries, schedule services, and help close deals.
 Rules:
 - Be helpful and professional.

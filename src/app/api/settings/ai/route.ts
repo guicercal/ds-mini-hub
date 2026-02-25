@@ -32,7 +32,8 @@ export async function GET() {
 
         return NextResponse.json({
             available,
-            active: settings.activeAiConfig
+            active: settings.activeAiConfig,
+            systemPrompt: settings.systemPrompt
         })
     } catch (e) {
         return NextResponse.json({ error: 'Failed retrieving AI settings' }, { status: 500 })
@@ -41,16 +42,21 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
-        const { activeAiConfig } = await request.json()
+        const body = await request.json()
+        const { activeAiConfig, systemPrompt } = body
 
-        if (!['GEMINI', 'OPENAI', 'CLAUDE'].includes(activeAiConfig)) {
+        if (activeAiConfig && !['GEMINI', 'OPENAI', 'CLAUDE'].includes(activeAiConfig)) {
             return NextResponse.json({ error: 'Invalid AI model config' }, { status: 400 })
         }
 
+        const updateData: any = {}
+        if (activeAiConfig) updateData.activeAiConfig = activeAiConfig
+        if (systemPrompt !== undefined) updateData.systemPrompt = systemPrompt
+
         const settings = await prisma.appSettings.upsert({
             where: { id: 'global' },
-            create: { id: 'global', activeAiConfig },
-            update: { activeAiConfig }
+            create: { id: 'global', ...updateData },
+            update: updateData
         })
 
         return NextResponse.json(settings)

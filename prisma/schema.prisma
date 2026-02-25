@@ -19,7 +19,7 @@ model Conversation {
 model Message {
   id             String       @id @default(uuid())
   conversationId String
-  senderType     String       // CUSTOMER, HUMAN_AGENT, AI_AGENT
+  senderType     String // CUSTOMER, HUMAN_AGENT, AI_AGENT
   text           String
   createdAt      DateTime     @default(now())
   hubspotNoteId  String?
@@ -28,7 +28,8 @@ model Message {
 }
 
 model AppSettings {
-  id             String   @id @default("global") 
+  id             String   @id @default("global")
   activeAiConfig String   @default("GEMINI") // "OPENAI", "GEMINI", "CLAUDE"
+  systemPrompt   String   @default("You are a helpful and professional dealership sales advisor named Max at DealSmart Motors. Your goal is to assist customers with their inquiries, schedule services, and help close deals. Rules: Be helpful and professional. Reference specific details from the conversation. AVOID MAKING UP INFORMATION. Do not invent prices, exact inventory colors, or random availability unless explicitly stated in the context. If you do not know, state that you will check and get back to them. Keep the response concise, suitable for SMS or a standard web chat.")
   updatedAt      DateTime @updatedAt
 }
